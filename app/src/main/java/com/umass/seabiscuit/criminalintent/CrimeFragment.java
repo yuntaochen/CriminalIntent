@@ -50,7 +50,28 @@ public class CrimeFragment extends Fragment {
                     .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
             updateDate();
-        }
+        } else if (requestCode == REQUEST_CONTACT) {
+            Uri contactUri = data.getData();
+            // Specify which fields you want your query to return
+            // values for.
+            String[] queryFields = new String[] {
+                    ContactsContract.Contacts.DISPLAY_NAME
+            };
+            // Perform your query - the contactUri is like a "where"
+            // clause here
+            Cursor c = getActivity().getContentResolver()
+                    .query(contactUri, queryFields, null, null, null);
+            // Double-check that you actually got results
+            if (c.getCount() == 0) {
+                c.close();
+                return; }
+            // Pull out the first column of the first row of data -
+            // that is your suspect's name.
+            c.moveToFirst();
+            String suspect = c.getString(0);
+            mCrime.setSuspect(suspect);
+            mSuspectButton.setText(suspect);
+            c.close(); }
     }
 
     private void updateDate() {
